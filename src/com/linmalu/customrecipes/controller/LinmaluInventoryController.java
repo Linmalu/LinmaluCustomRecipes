@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -29,7 +28,7 @@ import com.linmalu.library.api.LinmaluItemStack;
 public class LinmaluInventoryController
 {
 	private static final Map<Player, LinmaluInventoryController> map = new HashMap<>();
-	private static final int[] INVENTORY_NUMBER = {11, 12, 13, 20, 21, 22, 29, 30, 31};
+	private static final int[] RECIPE_NUMBER = {11, 12, 13, 20, 21, 22, 29, 30, 31};
 	private static final ItemStack ITEM0 = LinmaluItemStack.getItemStack(Material.STAINED_GLASS_PANE, 1, 0, true, " ", "");
 	private static final ItemStack ITEM1 = LinmaluItemStack.getItemStack(Material.WORKBENCH, 1, 0, true, ChatColor.GREEN + "조합대 조합법 보기", ChatColor.GRAY + "단축키 : 1");
 	private static final ItemStack ITEM2 = LinmaluItemStack.getItemStack(Material.FURNACE, 1, 0, true, ChatColor.GREEN + "화로 조합법 보기", ChatColor.GRAY + "단축키 : 2");
@@ -56,8 +55,7 @@ public class LinmaluInventoryController
 				event.setCancelled(true);
 				return;
 			}
-			Bukkit.broadcastMessage((event.getRawSlot() / 9 < 1) + " / " + (event.getRawSlot() / 9 > 3) + " / " + (event.getRawSlot() % 9 < 2) + " / " + (event.getRawSlot() % 9 > 4));
-			if(!lic.player.isOp() || lic.stat == 0 || lic.stat % 10 == 1 || (lic.stat == 2 && event.getRawSlot() != 24 && (event.getRawSlot() / 9 < 1 || event.getRawSlot() / 9 > 3 || event.getRawSlot() % 9 < 2 || event.getRawSlot() % 9 > 4)) || (lic.stat == 12 && event.getRawSlot() != 20 && event.getRawSlot() != 24))
+			if(!lic.player.isOp() || lic.stat == 0 || lic.stat % 10 == 1 || (lic.stat == 2 && !lic.isRecipeItemNumber(event.getRawSlot())) || (lic.stat == 12 && event.getRawSlot() != 20 && event.getRawSlot() != 24))
 			{
 				if(event.getRawSlot() < 54 || event.getClick() == ClickType.SHIFT_LEFT || event.isShiftClick())
 				{
@@ -176,13 +174,6 @@ public class LinmaluInventoryController
 			}
 		}
 	}
-	public static void InventoryDragEvent(InventoryDragEvent event)
-	{
-		if(event.getInventory().getTitle().equals(Main.INVENTORY_TITLE))
-		{
-			Bukkit.broadcastMessage("작동");
-		}
-	}
 	public static void InventoryCloseEvent(InventoryCloseEvent event)
 	{
 		if(event.getInventory().getTitle().equals(Main.INVENTORY_TITLE))
@@ -210,6 +201,7 @@ public class LinmaluInventoryController
 		inv.clear();
 		list.clear();
 		stat = 0;
+		page = 0;
 		for(int i = 0; i < inv.getSize(); i++)
 		{
 			ItemStack item = ITEM0;
@@ -260,7 +252,7 @@ public class LinmaluInventoryController
 		stat = 2;
 		for(int i = 0; i < inv.getSize(); i++)
 		{
-			if(i != 24 && !((1 <= i / 9 && i / 9 <= 3) && (2 <= i % 9 && i % 9 <= 4)))
+			if(!isRecipeItemNumber(i))
 			{
 				ItemStack item = ITEM0;
 				if(i == 41)
@@ -290,7 +282,7 @@ public class LinmaluInventoryController
 				for(int x = 0; x < sr.getShape()[y].length(); x++)
 				{
 					ItemStack item = sr.getIngredientMap().get(sr.getShape()[y].charAt(x));
-					inv.setItem(INVENTORY_NUMBER[3 * y + x], item != null ? new ItemStack(item.getType(), item.getAmount(), item.getDurability()) : null);
+					inv.setItem(RECIPE_NUMBER[3 * y + x], item != null ? new ItemStack(item.getType(), item.getAmount(), item.getDurability()) : null);
 				}
 			}
 		}
@@ -301,7 +293,7 @@ public class LinmaluInventoryController
 			for(int i = 0; i < sr.getIngredientList().size(); i++)
 			{
 				ItemStack item = sr.getIngredientList().get(i);
-				inv.setItem(INVENTORY_NUMBER[i], item != null ? new ItemStack(item.getType(), item.getAmount(), item.getDurability()) : null);
+				inv.setItem(RECIPE_NUMBER[i], item != null ? new ItemStack(item.getType(), item.getAmount(), item.getDurability()) : null);
 			}
 			inv.setItem(41, ITEM15);
 		}
@@ -400,47 +392,36 @@ public class LinmaluInventoryController
 		{
 			if(stat == 2)
 			{
-				if(LinmaluItemStack.equalsItemStack(inv.getItem(41), ITEM16, LinmaluItemStack.values()))
+				List<ItemStack> list = new ArrayList<>();
+				for(int number : RECIPE_NUMBER)
 				{
-					recipe = new ShapedRecipe(output);
-					StringBuilder shape = new StringBuilder();
-					for(int i = 0; i < LinmaluRecipeController.SHAPES.length; i++)
-					{
-						if(i > 0 && i % 3 == 0)
-						{
-							shape.append(",");
-						}
-						shape.append(inv.getItem(INVENTORY_NUMBER[i]) != null ? LinmaluRecipeController.SHAPES[i] : " ");
-					}
-					Bukkit.broadcastMessage(shape.toString());
-					((ShapedRecipe)recipe).shape(shape.toString().split(","));
-					for(int i = 0; i < INVENTORY_NUMBER.length; i++)
-					{
-						ItemStack item;
-						if((item = inv.getItem(INVENTORY_NUMBER[i])) != null)
-						{
-							((ShapedRecipe)recipe).setIngredient(LinmaluRecipeController.SHAPES[i], item.getData());
-						}
-					}
-					if(((ShapedRecipe)recipe).getIngredientMap().values().stream().filter(item -> item != null).count() == 0)
-					{
-						recipe = null;
-					}
+					list.add(inv.getItem(number));
 				}
-				else
+				if(list.stream().filter(item -> item != null).count() != 0)
 				{
-					recipe = new ShapelessRecipe(output);
-					for(int i : INVENTORY_NUMBER)
+					if(LinmaluItemStack.equalsItemStack(inv.getItem(41), ITEM16, LinmaluItemStack.values()))
 					{
-						ItemStack item;
-						if((item = inv.getItem(i)) != null)
+						recipe = new ShapedRecipe(output);
+						((ShapedRecipe)recipe).shape(LinmaluRecipeController.getShape(list));
+						for(int i = 0; i < LinmaluRecipeController.SHAPES.length; i++)
 						{
-							((ShapelessRecipe)recipe).addIngredient(item.getAmount(), item.getData());
+							ItemStack item;
+							if((item = list.get(i)) != null)
+							{
+								((ShapedRecipe)recipe).setIngredient(LinmaluRecipeController.SHAPES[i], item.getData());
+							}
 						}
 					}
-					if(((ShapelessRecipe)recipe).getIngredientList().stream().filter(item -> item != null).count() == 0)
+					else
 					{
-						recipe = null;
+						recipe = new ShapelessRecipe(output);
+						for(ItemStack item : list)
+						{
+							if(item != null)
+							{
+								((ShapelessRecipe)recipe).addIngredient(item.getAmount(), item.getData());
+							}
+						}
 					}
 				}
 			}
@@ -513,6 +494,24 @@ public class LinmaluInventoryController
 				item = ITEM9;
 			}
 			inv.setItem(i, item);
+		}
+	}
+	private boolean isRecipeItemNumber(int number)
+	{
+		if(number == 24)
+		{
+			return true;
+		}
+		else
+		{
+			for(int i : RECIPE_NUMBER)
+			{
+				if(i == number)
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }
