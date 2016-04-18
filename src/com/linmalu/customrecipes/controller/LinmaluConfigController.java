@@ -8,47 +8,44 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
 import com.linmalu.customrecipes.Main;
+import com.linmalu.customrecipes.controller.LinmaluRecipeController.LinmaluRecipe;
 import com.linmalu.library.api.LinmaluYamlConfiguration;
 
 public class LinmaluConfigController
 {
-	private static final String TYPE = "Type";
-	private static final String INPUT = "Input";
-	private static final String OUTPUT = "Output";
 	private static final File file = new File(Main.getMain().getDataFolder(), "config.yml");
-	private static List<LinmaluRecipeController> recipes = new ArrayList<>();
+	private static List<LinmaluRecipe> recipes = new ArrayList<>();
 
-	@SuppressWarnings("unchecked")
 	public void load()
 	{
+		LinmaluRecipeController.createLinmaluRecipe(null);
 		recipes.clear();
 		if(file.exists())
 		{
 			LinmaluYamlConfiguration config = LinmaluYamlConfiguration.loadConfiguration(file);
 			for(String key : config.getKeys(false))
 			{
-				recipes.add(LinmaluRecipeController.createLinmaluRecipe(config.getInt(key + "." + TYPE), (List<ItemStack>)config.getList(key + "." + INPUT), (ItemStack)config.get(key + "." + OUTPUT)));
+				recipes.add((LinmaluRecipe)config.get(key));
 			}
 			changeRecipe();
 		}
 		else
 		{
-			resetRecipe();
+			Iterator<Recipe> recipe = Bukkit.recipeIterator();
+			while(recipe.hasNext())
+			{
+				recipes.add(LinmaluRecipeController.createLinmaluRecipe(recipe.next()));
+			}
+			changeRecipe();
 		}
 	}
 	public void save()
 	{
 		LinmaluYamlConfiguration config = new LinmaluYamlConfiguration();
-		recipes.forEach(recipe ->
-		{
-			config.set(recipe.hashCode() + "." + TYPE, recipe.getType());
-			config.set(recipe.hashCode() + "." + INPUT, recipe.getInput());
-			config.set(recipe.hashCode() + "." + OUTPUT, recipe.getOutput());
-		});
+		recipes.forEach(recipe -> config.set(String.valueOf(recipe.hashCode()), recipe));
 		try
 		{
 			config.save(file);
@@ -70,6 +67,7 @@ public class LinmaluConfigController
 	}
 	public void resetRecipe()
 	{
+		recipes.clear();
 		Bukkit.resetRecipes();
 		Iterator<Recipe> recipe = Bukkit.recipeIterator();
 		while(recipe.hasNext())
@@ -85,7 +83,7 @@ public class LinmaluConfigController
 	}
 	public void removeRecipe(Recipe recipe)
 	{
-		for(LinmaluRecipeController lr : recipes)
+		for(LinmaluRecipe lr : recipes)
 		{
 			if(lr.equalsRecipe(recipe))
 			{

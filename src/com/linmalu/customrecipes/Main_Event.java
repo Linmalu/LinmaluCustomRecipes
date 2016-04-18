@@ -5,7 +5,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.linmalu.customrecipes.controller.LinmaluInventoryController;
@@ -26,11 +25,6 @@ public class Main_Event implements Listener
 	public void Event(InventoryClickEvent event)
 	{
 		LinmaluInventoryController.InventoryClickEvent(event);
-	}
-	@EventHandler
-	public void Event(InventoryDragEvent event)
-	{
-		LinmaluInventoryController.InventoryDragEvent(event);
 	}
 	@EventHandler
 	public void Event(InventoryCloseEvent event)

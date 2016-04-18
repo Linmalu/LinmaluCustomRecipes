@@ -17,16 +17,11 @@ public class Main extends LinmaluMain
 	@Override
 	public void onEnable()
 	{
+		super.onEnable();
 		registerCommand(new Main_Command());
 		registerEvents(new Main_Event());
 		config = new LinmaluConfigController();
 		config.load();
-		getLogger().info("제작 : 린마루(Linmalu)");
-	}
-	@Override
-	public void onDisable()
-	{
-		getLogger().info("제작 : 린마루(Linmalu)");
 	}
 	public LinmaluConfigController getRecipeConfig()
 	{
