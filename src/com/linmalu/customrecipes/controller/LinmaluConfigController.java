@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Recipe;
 
 import com.linmalu.customrecipes.Main;
 import com.linmalu.customrecipes.controller.LinmaluRecipeController.LinmaluRecipe;
-import com.linmalu.library.api.LinmaluYamlConfiguration;
 
 public class LinmaluConfigController
 {
@@ -25,7 +25,7 @@ public class LinmaluConfigController
 		recipes.clear();
 		if(file.exists())
 		{
-			LinmaluYamlConfiguration config = LinmaluYamlConfiguration.loadConfiguration(file);
+			YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 			for(String key : config.getKeys(false))
 			{
 				recipes.add((LinmaluRecipe)config.get(key));
@@ -44,7 +44,7 @@ public class LinmaluConfigController
 	}
 	public void save()
 	{
-		LinmaluYamlConfiguration config = new LinmaluYamlConfiguration();
+		YamlConfiguration config = new YamlConfiguration();
 		recipes.forEach(recipe -> config.set(String.valueOf(recipe.hashCode()), recipe));
 		try
 		{
