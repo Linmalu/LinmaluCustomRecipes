@@ -12,8 +12,6 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
-import com.linmalu.library.api.LinmaluItemStack;
-
 public class LinmaluRecipeController
 {
 	public static final char[] SHAPES = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'};
@@ -166,13 +164,16 @@ public class LinmaluRecipeController
 			{
 				type = NONE;
 			}
-			input.forEach(item ->
+			else
 			{
-				if(item != null && item.getAmount() == 0)
+				input.forEach(item ->
 				{
-					type = NONE;
-				}
-			});
+					if(item != null && item.getAmount() == 0)
+					{
+						type = NONE;
+					}
+				});
+			}
 		}
 		private LinmaluRecipe(int type, List<ItemStack> input, ItemStack output)
 		{
@@ -240,13 +241,13 @@ public class LinmaluRecipeController
 		public boolean equalsRecipe(Recipe recipe)
 		{
 			LinmaluRecipe target = createLinmaluRecipe(recipe);
-			if(type == target.getType() && input.size() == target.input.size() && LinmaluItemStack.equalsItemStack(output, target.output, LinmaluItemStack.TYPE, LinmaluItemStack.DURABILITY))
+			if(type == target.getType() && output.getType() == target.getOutput().getType() && input.size() == target.getInput().size())
 			{
 				for(int i = 0; i < input.size(); i++)
 				{
 					ItemStack item1 = input.get(i);
 					ItemStack item2 = target.input.get(i);
-					if(!(item1 != null && item2 != null && LinmaluItemStack.equalsItemStack(item1, item2, LinmaluItemStack.TYPE, LinmaluItemStack.DURABILITY) || item1 == null && item2 == null))
+					if(!((item1 != null && item2 != null && item1.getType() == item2.getType()) || item1 == null && item2 == null))
 					{
 						return false;
 					}

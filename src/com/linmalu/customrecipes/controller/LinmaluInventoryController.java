@@ -98,7 +98,7 @@ public class LinmaluInventoryController
 			}
 			else
 			{
-				if(event.getRawSlot() < 0)
+				if(event.getRawSlot() < 0 || event.getClick() == ClickType.DOUBLE_CLICK)
 				{
 					return;
 				}
