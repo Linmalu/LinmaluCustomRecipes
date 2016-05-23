@@ -69,8 +69,7 @@ public class LinmaluConfigController
 	{
 		recipes.clear();
 		Bukkit.resetRecipes();
-		Iterator<Recipe> recipe = Bukkit.recipeIterator();
-		while(recipe.hasNext())
+		for(Iterator<Recipe> recipe = Bukkit.recipeIterator(); recipe.hasNext();)
 		{
 			recipes.add(LinmaluRecipeController.createLinmaluRecipe(recipe.next()));
 		}
@@ -96,7 +95,7 @@ public class LinmaluConfigController
 	private void changeRecipe()
 	{
 		Bukkit.clearRecipes();
-		recipes.forEach(recipe -> Bukkit.addRecipe(recipe.toRecipe()));
+		recipes.stream().filter(recipe -> recipe.getType() != LinmaluRecipeController.NONE).forEach(recipe -> Bukkit.addRecipe(recipe.toRecipe()));
 		save();
 	}
 }

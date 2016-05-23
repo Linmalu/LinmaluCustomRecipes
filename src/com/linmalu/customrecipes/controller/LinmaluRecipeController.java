@@ -107,7 +107,7 @@ public class LinmaluRecipeController
 		private static final String KEY1 = "Type";
 		private static final String KEY2 = "Input";
 		private static final String KEY3 = "Output";
-		private final int type;
+		private int type;
 		private final List<ItemStack> input;
 		private final ItemStack output;
 
@@ -118,8 +118,8 @@ public class LinmaluRecipeController
 			{
 				type = FURNACE;
 				FurnaceRecipe fr = (FurnaceRecipe)recipe;
-				input.add(checkItemStack(fr.getInput()));
-				output = checkItemStack(fr.getResult());
+				input.add(fr.getInput());
+				output = fr.getResult();
 			}
 			else if(recipe instanceof ShapedRecipe)
 			{
@@ -138,7 +138,7 @@ public class LinmaluRecipeController
 								{
 									input.add(null);
 								}
-								input.add(checkItemStack(item));
+								input.add(item);
 								break;
 							}
 						}
@@ -148,20 +148,31 @@ public class LinmaluRecipeController
 				{
 					input.add(null);
 				}
-				output = checkItemStack(sr.getResult());
+				output = sr.getResult();
 			}
 			else if(recipe instanceof ShapelessRecipe)
 			{
 				type = SHAPELESS;
 				ShapelessRecipe sr = (ShapelessRecipe)recipe;
-				sr.getIngredientList().forEach(item -> input.add(checkItemStack(item)));
-				output = checkItemStack(sr.getResult());
+				sr.getIngredientList().forEach(item -> input.add(item));
+				output = sr.getResult();
 			}
 			else
 			{
 				type = NONE;
 				output = null;
 			}
+			if(output != null && output.getAmount() == 0)
+			{
+				type = NONE;
+			}
+			input.forEach(item ->
+			{
+				if(item != null && item.getAmount() == 0)
+				{
+					type = NONE;
+				}
+			});
 		}
 		private LinmaluRecipe(int type, List<ItemStack> input, ItemStack output)
 		{
@@ -183,14 +194,6 @@ public class LinmaluRecipeController
 		{
 			return new LinmaluRecipe((int)map.get(KEY1), (List<ItemStack>)map.get(KEY2), (ItemStack)map.get(KEY3));
 		}
-		private ItemStack checkItemStack(ItemStack item)
-		{
-			if(item != null && item.getDurability() == Short.MAX_VALUE)
-			{
-				item.setDurability((short)0);
-			}
-			return item;
-		}
 		public int getType()
 		{
 			return type;
@@ -203,13 +206,14 @@ public class LinmaluRecipeController
 		{
 			return output;
 		}
+		@SuppressWarnings("deprecation")
 		public Recipe toRecipe()
 		{
 			Recipe recipe = null;
 			switch(type)
 			{
 				case FURNACE:
-					recipe = new FurnaceRecipe(output, input.get(0).getData());
+					recipe = new FurnaceRecipe(output, input.get(0).getType(), input.get(0).getDurability());
 					break;
 				case SHAPED:
 					recipe = new ShapedRecipe(output);

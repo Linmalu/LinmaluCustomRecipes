@@ -94,6 +94,7 @@ public class LinmaluInventoryController
 						lic.backPage();
 						break;
 				}
+				event.setCancelled(true);
 			}
 			else
 			{
@@ -241,7 +242,7 @@ public class LinmaluInventoryController
 		}).skip(page * 45).limit(45).forEach(r ->
 		{
 			list.add(r);
-			inv.setItem(inv.firstEmpty(), r.getResult());
+			inv.setItem(inv.firstEmpty(), checkItemStack(r.getResult()));
 		});
 		baseItemStack();
 	}
@@ -282,7 +283,7 @@ public class LinmaluInventoryController
 				for(int x = 0; x < sr.getShape()[y].length(); x++)
 				{
 					ItemStack item = sr.getIngredientMap().get(sr.getShape()[y].charAt(x));
-					inv.setItem(RECIPE_NUMBER[3 * y + x], item != null ? new ItemStack(item.getType(), item.getAmount(), item.getDurability()) : null);
+					inv.setItem(RECIPE_NUMBER[3 * y + x], item != null ? checkItemStack(new ItemStack(item.getType(), item.getAmount(), item.getDurability())) : null);
 				}
 			}
 		}
@@ -293,7 +294,7 @@ public class LinmaluInventoryController
 			for(int i = 0; i < sr.getIngredientList().size(); i++)
 			{
 				ItemStack item = sr.getIngredientList().get(i);
-				inv.setItem(RECIPE_NUMBER[i], item != null ? new ItemStack(item.getType(), item.getAmount(), item.getDurability()) : null);
+				inv.setItem(RECIPE_NUMBER[i], item != null ? checkItemStack(new ItemStack(item.getType(), item.getAmount(), item.getDurability())) : null);
 			}
 			inv.setItem(41, ITEM15);
 		}
@@ -316,7 +317,7 @@ public class LinmaluInventoryController
 		}).skip(page * 45).limit(45).forEach(r ->
 		{
 			list.add(r);
-			inv.setItem(inv.firstEmpty(), r.getResult());
+			inv.setItem(inv.firstEmpty(), checkItemStack(r.getResult()));
 		});
 		baseItemStack();
 	}
@@ -347,8 +348,8 @@ public class LinmaluInventoryController
 		if(recipe != null && recipe instanceof FurnaceRecipe)
 		{
 			FurnaceRecipe fr = (FurnaceRecipe)recipe;
-			inv.setItem(20, new ItemStack(fr.getInput().getType()));
-			inv.setItem(24, fr.getResult());
+			inv.setItem(20, checkItemStack(fr.getInput()));
+			inv.setItem(24, checkItemStack(fr.getResult()));
 		}
 		baseItemStack();
 	}
@@ -384,6 +385,7 @@ public class LinmaluInventoryController
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getMain(), () -> player.closeInventory());
 		}
 	}
+	@SuppressWarnings("deprecation")
 	public Recipe toRecipe()
 	{
 		Recipe recipe = null;
@@ -430,7 +432,7 @@ public class LinmaluInventoryController
 				ItemStack item;
 				if((item = inv.getItem(20)) != null)
 				{
-					recipe = new FurnaceRecipe(output, item.getData());
+					recipe = new FurnaceRecipe(output, item.getType(), item.getDurability());
 				}
 			}
 		}
@@ -513,5 +515,13 @@ public class LinmaluInventoryController
 			}
 			return false;
 		}
+	}
+	private ItemStack checkItemStack(ItemStack item)
+	{
+		if(item != null && item.getDurability() == Short.MAX_VALUE)
+		{
+			item.setDurability((short)0);
+		}
+		return item;
 	}
 }
