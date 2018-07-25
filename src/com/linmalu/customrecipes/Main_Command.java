@@ -18,7 +18,6 @@ public class Main_Command implements CommandExecutor
 			new LinmaluInventoryController((Player)sender);
 			sender.sendMessage(ChatColor.GREEN + " = = = = = [ Linmalu Custom Recipes ] = = = = =");
 			sender.sendMessage(ChatColor.YELLOW + "제작자 : " + ChatColor.AQUA + "린마루(Linmalu)" + ChatColor.WHITE + " - http://blog.linmalu.com");
-			sender.sendMessage(ChatColor.YELLOW + "카페 : " + ChatColor.WHITE + "http://cafe.naver.com/craftproducer");
 			if(sender.isOp())
 			{
 				LinmaluVersion.check(Main.getMain(), sender);
