@@ -8,7 +8,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.linmalu.customrecipes.controller.LinmaluInventoryController;
-import com.linmalu.library.api.LinmaluVersion;
+import com.linmalu.library.api.LinmaluServer;
 
 public class Main_Event implements Listener
 {
@@ -18,7 +18,7 @@ public class Main_Event implements Listener
 		Player player = event.getPlayer();
 		if(player.isOp())
 		{
-			LinmaluVersion.check(Main.getMain(), player);
+			LinmaluServer.version(Main.getMain(), player);
 		}
 	}
 	@EventHandler

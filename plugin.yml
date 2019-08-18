@@ -1,0 +1,13 @@
+main: com.linmalu.customrecipes.Main
+name: LinmaluCustomRecipes
+version: 1.12.2.0
+author: 린마루(Linmalu)
+website: http://blog.linmalu.com/
+description: 조합법
+depend: [ProtocolLib, LinmaluLibrary]
+
+commands:
+    LinmaluCustomRecipes:
+        description: '조합법'
+        aliases: [lcr, 조합법]
+        usage: '명령어 : /<command>'

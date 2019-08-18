@@ -1,6 +1,7 @@
 package com.linmalu.customrecipes.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,16 +12,19 @@ import java.util.stream.StreamSupport;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.linmalu.customrecipes.Main;
 import com.linmalu.library.api.LinmaluItemStack;
@@ -28,22 +32,40 @@ import com.linmalu.library.api.LinmaluItemStack;
 public class LinmaluInventoryController
 {
 	private static final Map<Player, LinmaluInventoryController> map = new HashMap<>();
+	private static NamespacedKey key = new NamespacedKey(Main.getMain(), Main.getMain().getDescription().getName());
 	private static final int[] RECIPE_NUMBER = {11, 12, 13, 20, 21, 22, 29, 30, 31};
-	private static final ItemStack ITEM0 = LinmaluItemStack.getItemStack(Material.STAINED_GLASS_PANE, 1, 0, true, " ", "");
-	private static final ItemStack ITEM1 = LinmaluItemStack.getItemStack(Material.WORKBENCH, 1, 0, true, ChatColor.GREEN + "조합대 조합법 보기", ChatColor.GRAY + "단축키 : 1");
-	private static final ItemStack ITEM2 = LinmaluItemStack.getItemStack(Material.FURNACE, 1, 0, true, ChatColor.GREEN + "화로 조합법 보기", ChatColor.GRAY + "단축키 : 2");
-	private static final ItemStack ITEM4 = LinmaluItemStack.getItemStack(Material.WORKBENCH, 1, 0, true, ChatColor.GREEN + "조합대 조합법 추가", ChatColor.GRAY + "단축키 : 4");
-	private static final ItemStack ITEM5 = LinmaluItemStack.getItemStack(Material.FURNACE, 1, 0, true, ChatColor.GREEN + "화로 조합법 추가", ChatColor.GRAY + "단축키 : 5");
-	private static final ItemStack ITEM7 = LinmaluItemStack.getItemStack(Material.SOUL_SAND, 1, 0, true, ChatColor.GREEN + "이전페이지", ChatColor.GRAY + "단축키 : 7");
-	private static final ItemStack ITEM8 = LinmaluItemStack.getItemStack(Material.GLOWSTONE, 1, 0, true, ChatColor.GREEN + "다음페이지", ChatColor.GRAY + "단축키 : 8");
-	private static final ItemStack ITEM9 = LinmaluItemStack.getItemStack(Material.BARRIER, 1, 0, true, ChatColor.GREEN + "이전으로", ChatColor.GRAY + "단축키 : 9");
-	private static final ItemStack ITEM10 = LinmaluItemStack.getItemStack(Material.BARRIER, 1, 0, true, ChatColor.GREEN + "조합대 조합법 지우기");
-	private static final ItemStack ITEM11 = LinmaluItemStack.getItemStack(Material.BARRIER, 1, 0, true, ChatColor.GREEN + "화로 조합법 지우기");
-	private static final ItemStack ITEM12 = LinmaluItemStack.getItemStack(Material.BOOK, 1, 0, true, ChatColor.GREEN + "조합법 기본으로 되돌리기");
-	private static final ItemStack ITEM13 = LinmaluItemStack.getItemStack(Material.DIAMOND_PICKAXE, 1, 0, true, ChatColor.GREEN + "조합법 추가");
-	private static final ItemStack ITEM14 = LinmaluItemStack.getItemStack(Material.BARRIER, 1, 0, true, ChatColor.GREEN + "조합법 삭제");
-	private static final ItemStack ITEM15 = LinmaluItemStack.getItemStack(Material.SOUL_SAND, 1, 0, true, ChatColor.GREEN + "무작위순서");
-	private static final ItemStack ITEM16 = LinmaluItemStack.getItemStack(Material.GLOWSTONE, 1, 0, true, ChatColor.GREEN + "정확한순서");
+	private static final ItemStack ITEM0 = getItemStack(Material.STAINED_GLASS_PANE, 1, 0, true, " ", "");
+	private static final ItemStack ITEM1 = getItemStack(Material.WORKBENCH, 1, 0, true, ChatColor.GREEN + "조합대 조합법 보기", ChatColor.GRAY + "단축키 : 1");
+	private static final ItemStack ITEM2 = getItemStack(Material.FURNACE, 1, 0, true, ChatColor.GREEN + "화로 조합법 보기", ChatColor.GRAY + "단축키 : 2");
+	private static final ItemStack ITEM4 = getItemStack(Material.WORKBENCH, 1, 0, true, ChatColor.GREEN + "조합대 조합법 추가", ChatColor.GRAY + "단축키 : 4");
+	private static final ItemStack ITEM5 = getItemStack(Material.FURNACE, 1, 0, true, ChatColor.GREEN + "화로 조합법 추가", ChatColor.GRAY + "단축키 : 5");
+	private static final ItemStack ITEM7 = getItemStack(Material.SOUL_SAND, 1, 0, true, ChatColor.GREEN + "이전페이지", ChatColor.GRAY + "단축키 : 7");
+	private static final ItemStack ITEM8 = getItemStack(Material.GLOWSTONE, 1, 0, true, ChatColor.GREEN + "다음페이지", ChatColor.GRAY + "단축키 : 8");
+	private static final ItemStack ITEM9 = getItemStack(Material.BARRIER, 1, 0, true, ChatColor.GREEN + "이전으로", ChatColor.GRAY + "단축키 : 9");
+	private static final ItemStack ITEM10 = getItemStack(Material.BARRIER, 1, 0, true, ChatColor.GREEN + "조합대 조합법 지우기");
+	private static final ItemStack ITEM11 = getItemStack(Material.BARRIER, 1, 0, true, ChatColor.GREEN + "화로 조합법 지우기");
+	private static final ItemStack ITEM12 = getItemStack(Material.BOOK, 1, 0, true, ChatColor.GREEN + "조합법 기본으로 되돌리기");
+	private static final ItemStack ITEM13 = getItemStack(Material.DIAMOND_PICKAXE, 1, 0, true, ChatColor.GREEN + "조합법 추가");
+	private static final ItemStack ITEM14 = getItemStack(Material.BARRIER, 1, 0, true, ChatColor.GREEN + "조합법 삭제");
+	private static final ItemStack ITEM15 = getItemStack(Material.SOUL_SAND, 1, 0, true, ChatColor.GREEN + "무작위순서");
+	private static final ItemStack ITEM16 = getItemStack(Material.GLOWSTONE, 1, 0, true, ChatColor.GREEN + "정확한순서");
+
+	public static ItemStack getItemStack(Material type, int amount, int damage, boolean hideFlag, String name, String ... lore)
+	{
+		ItemStack item = new ItemStack(type, amount, (short)damage);
+		ItemMeta im = item.getItemMeta();
+		if(hideFlag)
+		{
+			im.addItemFlags(ItemFlag.values());
+		}
+		im.setDisplayName(name);
+		if(!(lore.length == 1 && lore[0].equals("")))
+		{
+			im.setLore(Arrays.asList(lore));
+		}
+		item.setItemMeta(im);
+		return item;
+	}
 
 	public static void InventoryClickEvent(InventoryClickEvent event)
 	{
@@ -106,47 +128,47 @@ public class LinmaluInventoryController
 				{
 					lic.changeView(event.getRawSlot());
 				}
-				else if(LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM1, LinmaluItemStack.values()))
+				else if(LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM1))
 				{
 					lic.changeRecipeList(0);
 				}
-				else if(LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM2, LinmaluItemStack.values()))
+				else if(LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM2))
 				{
 					lic.changeFurnaceList(0);
 				}
-				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM4, LinmaluItemStack.values()))
+				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM4))
 				{
 					lic.changeRecipeView(null);
 				}
-				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM5, LinmaluItemStack.values()))
+				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM5))
 				{
 					lic.changeFurnaceView(null);
 				}
-				else if(LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM7, LinmaluItemStack.values()))
+				else if(LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM7))
 				{
 					lic.beforePage();
 				}
-				else if(LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM8, LinmaluItemStack.values()))
+				else if(LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM8))
 				{
 					lic.nextPage();
 				}
-				else if(LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM9, LinmaluItemStack.values()))
+				else if(LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM9))
 				{
 					lic.backPage();
 				}
-				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM10, LinmaluItemStack.values()))
+				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM10))
 				{
 					Main.getMain().getRecipeConfig().clearRecipe();
 				}
-				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM11, LinmaluItemStack.values()))
+				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM11))
 				{
 					Main.getMain().getRecipeConfig().clearFurnace();
 				}
-				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM12, LinmaluItemStack.values()))
+				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM12))
 				{
 					Main.getMain().getRecipeConfig().resetRecipe();
 				}
-				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM13, LinmaluItemStack.values()))
+				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM13))
 				{
 					Recipe recipe = lic.toRecipe();
 					if(recipe != null)
@@ -155,7 +177,7 @@ public class LinmaluInventoryController
 						lic.backPage();
 					}
 				}
-				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM14, LinmaluItemStack.values()))
+				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM14))
 				{
 					Recipe recipe = lic.toRecipe();
 					if(recipe != null)
@@ -164,11 +186,11 @@ public class LinmaluInventoryController
 						lic.backPage();
 					}
 				}
-				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM15, LinmaluItemStack.values()))
+				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM15))
 				{
 					lic.inv.setItem(event.getRawSlot(), ITEM16);
 				}
-				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM16, LinmaluItemStack.values()))
+				else if(lic.player.isOp() && LinmaluItemStack.equalsItemStack(event.getCurrentItem(), ITEM16))
 				{
 					lic.inv.setItem(event.getRawSlot(), ITEM15);
 				}
@@ -401,9 +423,9 @@ public class LinmaluInventoryController
 				}
 				if(list.stream().filter(item -> item != null).count() != 0)
 				{
-					if(LinmaluItemStack.equalsItemStack(inv.getItem(41), ITEM16, LinmaluItemStack.values()))
+					if(LinmaluItemStack.equalsItemStack(inv.getItem(41), ITEM16))
 					{
-						recipe = new ShapedRecipe(output);
+						recipe = new ShapedRecipe(key, output);
 						((ShapedRecipe)recipe).shape(LinmaluRecipeController.getShape(list));
 						for(int i = 0; i < LinmaluRecipeController.SHAPES.length; i++)
 						{
