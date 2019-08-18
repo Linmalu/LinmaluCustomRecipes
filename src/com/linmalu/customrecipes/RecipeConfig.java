@@ -1,7 +1,7 @@
-package com.linmalu.customrecipes.controller;
+package com.linmalu.customrecipes;
 
-import com.linmalu.customrecipes.Main;
-import com.linmalu.customrecipes.controller.LinmaluRecipeController.LinmaluRecipe;
+import com.linmalu.customrecipes.controller.LinmaluRecipeController;
+import com.linmalu.library.api.LinmaluConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Recipe;
@@ -13,10 +13,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class LinmaluConfigController
+public class RecipeConfig
 {
 	private static final File file = new File(Main.getMain().getDataFolder(), "config.yml");
-	private static List<LinmaluRecipe> recipes = new ArrayList<>();
+	private static List<LinmaluRecipeController.LinmaluRecipe> recipes = new ArrayList<>();
 
 	public void load()
 	{
@@ -27,7 +27,7 @@ public class LinmaluConfigController
 			YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 			for(String key : config.getKeys(false))
 			{
-				recipes.add((LinmaluRecipe)config.get(key));
+				recipes.add((LinmaluRecipeController.LinmaluRecipe)config.get(key));
 			}
 			changeRecipe();
 		}
@@ -87,7 +87,7 @@ public class LinmaluConfigController
 
 	public void removeRecipe(Recipe recipe)
 	{
-		for(LinmaluRecipe lr : recipes)
+		for(LinmaluRecipeController.LinmaluRecipe lr : recipes)
 		{
 			if(lr.equalsRecipe(recipe))
 			{
