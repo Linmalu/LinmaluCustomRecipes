@@ -1,18 +1,17 @@
 package com.linmalu.customrecipes.controller;
 
+import com.linmalu.customrecipes.Main;
+import com.linmalu.customrecipes.controller.LinmaluRecipeController.LinmaluRecipe;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.Recipe;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.Recipe;
-
-import com.linmalu.customrecipes.Main;
-import com.linmalu.customrecipes.controller.LinmaluRecipeController.LinmaluRecipe;
 
 public class LinmaluConfigController
 {
@@ -42,6 +41,7 @@ public class LinmaluConfigController
 			changeRecipe();
 		}
 	}
+
 	public void save()
 	{
 		YamlConfiguration config = new YamlConfiguration();
@@ -55,31 +55,36 @@ public class LinmaluConfigController
 			e.printStackTrace();
 		}
 	}
+
 	public void clearRecipe()
 	{
 		recipes = recipes.stream().filter(recipe -> recipe.getType() == LinmaluRecipeController.FURNACE).collect(Collectors.toList());
 		changeRecipe();
 	}
+
 	public void clearFurnace()
 	{
 		recipes = recipes.stream().filter(recipe -> recipe.getType() == LinmaluRecipeController.SHAPED || recipe.getType() == LinmaluRecipeController.SHAPELESS).collect(Collectors.toList());
 		changeRecipe();
 	}
+
 	public void resetRecipe()
 	{
 		recipes.clear();
 		Bukkit.resetRecipes();
-		for(Iterator<Recipe> recipe = Bukkit.recipeIterator(); recipe.hasNext();)
+		for(Iterator<Recipe> recipe = Bukkit.recipeIterator(); recipe.hasNext(); )
 		{
 			recipes.add(LinmaluRecipeController.createLinmaluRecipe(recipe.next()));
 		}
 		changeRecipe();
 	}
+
 	public void addRecipe(Recipe recipe)
 	{
 		recipes.add(LinmaluRecipeController.createLinmaluRecipe(recipe));
 		changeRecipe();
 	}
+
 	public void removeRecipe(Recipe recipe)
 	{
 		for(LinmaluRecipe lr : recipes)
@@ -92,6 +97,7 @@ public class LinmaluConfigController
 			}
 		}
 	}
+
 	private void changeRecipe()
 	{
 		Bukkit.clearRecipes();

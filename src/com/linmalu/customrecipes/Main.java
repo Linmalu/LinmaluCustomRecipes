@@ -9,7 +9,7 @@ public class Main extends LinmaluMain
 
 	public static Main getMain()
 	{
-		return (Main)LinmaluMain.getMain();
+		return (Main)LinmaluMain.getInstance();
 	}
 
 	private LinmaluConfigController config;
@@ -18,11 +18,12 @@ public class Main extends LinmaluMain
 	public void onEnable()
 	{
 		super.onEnable();
-		registerCommand(new Main_Command());
-		registerEvents(new Main_Event());
 		config = new LinmaluConfigController();
 		config.load();
+		new Main_Command(this);
+		new Main_Event(this);
 	}
+
 	public LinmaluConfigController getRecipeConfig()
 	{
 		return config;

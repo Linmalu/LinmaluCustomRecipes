@@ -1,16 +1,12 @@
 package com.linmalu.customrecipes.controller;
 
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.inventory.*;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.inventory.FurnaceRecipe;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.ShapelessRecipe;
 
 public class LinmaluRecipeController
 {
@@ -24,6 +20,7 @@ public class LinmaluRecipeController
 	{
 		return new LinmaluRecipe(recipe);
 	}
+
 	public static String[] getShape(List<ItemStack> list)
 	{
 		if(list == null || list.size() < 9)
@@ -100,6 +97,7 @@ public class LinmaluRecipeController
 		}
 		return shape.toString().split(",");
 	}
+
 	public static class LinmaluRecipe implements ConfigurationSerializable
 	{
 		private static final String KEY1 = "Type";
@@ -175,12 +173,14 @@ public class LinmaluRecipeController
 				});
 			}
 		}
+
 		private LinmaluRecipe(int type, List<ItemStack> input, ItemStack output)
 		{
 			this.type = type;
 			this.input = input;
 			this.output = output;
 		}
+
 		@Override
 		public Map<String, Object> serialize()
 		{
@@ -190,23 +190,28 @@ public class LinmaluRecipeController
 			map.put(KEY3, output);
 			return map;
 		}
+
 		@SuppressWarnings("unchecked")
 		public static LinmaluRecipe deserialize(Map<String, Object> map)
 		{
 			return new LinmaluRecipe((int)map.get(KEY1), (List<ItemStack>)map.get(KEY2), (ItemStack)map.get(KEY3));
 		}
+
 		public int getType()
 		{
 			return type;
 		}
+
 		public List<ItemStack> getInput()
 		{
 			return input;
 		}
+
 		public ItemStack getOutput()
 		{
 			return output;
 		}
+
 		@SuppressWarnings("deprecation")
 		public Recipe toRecipe()
 		{
@@ -238,6 +243,7 @@ public class LinmaluRecipeController
 			}
 			return recipe;
 		}
+
 		public boolean equalsRecipe(Recipe recipe)
 		{
 			LinmaluRecipe target = createLinmaluRecipe(recipe);

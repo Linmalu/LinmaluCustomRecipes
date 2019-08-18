@@ -1,14 +1,7 @@
 package com.linmalu.customrecipes.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.StreamSupport;
-
+import com.linmalu.customrecipes.Main;
+import com.linmalu.library.api.LinmaluItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,27 +10,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.inventory.FurnaceRecipe;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.linmalu.customrecipes.Main;
-import com.linmalu.library.api.LinmaluItemStack;
+import java.util.*;
+import java.util.stream.StreamSupport;
 
 public class LinmaluInventoryController
 {
 	private static final Map<Player, LinmaluInventoryController> map = new HashMap<>();
 	private static NamespacedKey key = new NamespacedKey(Main.getMain(), Main.getMain().getDescription().getName());
 	private static final int[] RECIPE_NUMBER = {11, 12, 13, 20, 21, 22, 29, 30, 31};
-	private static final ItemStack ITEM0 = getItemStack(Material.STAINED_GLASS_PANE, 1, 0, true, " ", "");
-	private static final ItemStack ITEM1 = getItemStack(Material.WORKBENCH, 1, 0, true, ChatColor.GREEN + "조합대 조합법 보기", ChatColor.GRAY + "단축키 : 1");
+	private static final ItemStack ITEM0 = getItemStack(Material.WHITE_STAINED_GLASS_PANE, 1, 0, true, " ", "");
+	private static final ItemStack ITEM1 = getItemStack(Material.CRAFTING_TABLE, 1, 0, true, ChatColor.GREEN + "조합대 조합법 보기", ChatColor.GRAY + "단축키 : 1");
 	private static final ItemStack ITEM2 = getItemStack(Material.FURNACE, 1, 0, true, ChatColor.GREEN + "화로 조합법 보기", ChatColor.GRAY + "단축키 : 2");
-	private static final ItemStack ITEM4 = getItemStack(Material.WORKBENCH, 1, 0, true, ChatColor.GREEN + "조합대 조합법 추가", ChatColor.GRAY + "단축키 : 4");
+	private static final ItemStack ITEM4 = getItemStack(Material.CRAFTING_TABLE, 1, 0, true, ChatColor.GREEN + "조합대 조합법 추가", ChatColor.GRAY + "단축키 : 4");
 	private static final ItemStack ITEM5 = getItemStack(Material.FURNACE, 1, 0, true, ChatColor.GREEN + "화로 조합법 추가", ChatColor.GRAY + "단축키 : 5");
 	private static final ItemStack ITEM7 = getItemStack(Material.SOUL_SAND, 1, 0, true, ChatColor.GREEN + "이전페이지", ChatColor.GRAY + "단축키 : 7");
 	private static final ItemStack ITEM8 = getItemStack(Material.GLOWSTONE, 1, 0, true, ChatColor.GREEN + "다음페이지", ChatColor.GRAY + "단축키 : 8");
@@ -50,7 +37,7 @@ public class LinmaluInventoryController
 	private static final ItemStack ITEM15 = getItemStack(Material.SOUL_SAND, 1, 0, true, ChatColor.GREEN + "무작위순서");
 	private static final ItemStack ITEM16 = getItemStack(Material.GLOWSTONE, 1, 0, true, ChatColor.GREEN + "정확한순서");
 
-	public static ItemStack getItemStack(Material type, int amount, int damage, boolean hideFlag, String name, String ... lore)
+	public static ItemStack getItemStack(Material type, int amount, int damage, boolean hideFlag, String name, String... lore)
 	{
 		ItemStack item = new ItemStack(type, amount, (short)damage);
 		ItemMeta im = item.getItemMeta();
@@ -197,6 +184,7 @@ public class LinmaluInventoryController
 			}
 		}
 	}
+
 	public static void InventoryCloseEvent(InventoryCloseEvent event)
 	{
 		if(event.getInventory().getTitle().equals(Main.INVENTORY_TITLE))
@@ -219,6 +207,7 @@ public class LinmaluInventoryController
 		player.openInventory(inv);
 		changeBase();
 	}
+
 	public void changeBase()
 	{
 		inv.clear();
@@ -247,6 +236,7 @@ public class LinmaluInventoryController
 		}
 		baseItemStack();
 	}
+
 	@SuppressWarnings("deprecation")
 	public void changeRecipeList(int page)
 	{
@@ -255,7 +245,7 @@ public class LinmaluInventoryController
 		stat = 1;
 		StreamSupport.stream(Spliterators.spliteratorUnknownSize(Bukkit.recipeIterator(), Spliterator.ORDERED), false).filter(r -> r instanceof ShapedRecipe || r instanceof ShapelessRecipe).sorted((a, b) ->
 		{
-			int compare = Integer.compare(a.getResult().getTypeId(), b.getResult().getTypeId());
+			int compare = Integer.compare(a.getResult().getType().getId(), b.getResult().getType().getId());
 			if(compare == 0)
 			{
 				compare = Integer.compare(a.getResult().getDurability(), b.getResult().getDurability());
@@ -268,6 +258,7 @@ public class LinmaluInventoryController
 		});
 		baseItemStack();
 	}
+
 	public void changeRecipeView(Recipe recipe)
 	{
 		inv.clear();
@@ -322,6 +313,7 @@ public class LinmaluInventoryController
 		}
 		baseItemStack();
 	}
+
 	@SuppressWarnings("deprecation")
 	public void changeFurnaceList(int page)
 	{
@@ -330,7 +322,7 @@ public class LinmaluInventoryController
 		stat = 11;
 		StreamSupport.stream(Spliterators.spliteratorUnknownSize(Bukkit.recipeIterator(), Spliterator.ORDERED), false).filter(r -> r instanceof FurnaceRecipe).sorted((a, b) ->
 		{
-			int compare = Integer.compare(a.getResult().getTypeId(), b.getResult().getTypeId());
+			int compare = Integer.compare(a.getResult().getType().getId(), b.getResult().getType().getId());
 			if(compare == 0)
 			{
 				compare = Integer.compare(a.getResult().getDurability(), b.getResult().getDurability());
@@ -343,6 +335,7 @@ public class LinmaluInventoryController
 		});
 		baseItemStack();
 	}
+
 	public void changeFurnaceView(Recipe recipe)
 	{
 		inv.clear();
@@ -375,6 +368,7 @@ public class LinmaluInventoryController
 		}
 		baseItemStack();
 	}
+
 	public void beforePage()
 	{
 		if(page != 0 && stat % 10 == 1)
@@ -383,6 +377,7 @@ public class LinmaluInventoryController
 			changePage();
 		}
 	}
+
 	public void nextPage()
 	{
 		if(inv.firstEmpty() == -1 && stat % 10 == 1)
@@ -391,6 +386,7 @@ public class LinmaluInventoryController
 			changePage();
 		}
 	}
+
 	public void backPage()
 	{
 		if(stat % 10 == 2)
@@ -407,6 +403,7 @@ public class LinmaluInventoryController
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getMain(), () -> player.closeInventory());
 		}
 	}
+
 	@SuppressWarnings("deprecation")
 	public Recipe toRecipe()
 	{
@@ -460,6 +457,7 @@ public class LinmaluInventoryController
 		}
 		return recipe;
 	}
+
 	private void changePage()
 	{
 		switch(stat)
@@ -472,6 +470,7 @@ public class LinmaluInventoryController
 				break;
 		}
 	}
+
 	private void changeView(int number)
 	{
 		switch(stat)
@@ -484,6 +483,7 @@ public class LinmaluInventoryController
 				break;
 		}
 	}
+
 	private void baseItemStack()
 	{
 		for(int i = 45; i < inv.getSize(); i++)
@@ -520,6 +520,7 @@ public class LinmaluInventoryController
 			inv.setItem(i, item);
 		}
 	}
+
 	private boolean isRecipeItemNumber(int number)
 	{
 		if(number == 24)
@@ -538,6 +539,7 @@ public class LinmaluInventoryController
 			return false;
 		}
 	}
+
 	private ItemStack checkItemStack(ItemStack item)
 	{
 		if(item != null && item.getDurability() == Short.MAX_VALUE)
