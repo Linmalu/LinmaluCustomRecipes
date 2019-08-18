@@ -1,4 +1,4 @@
-package com.linmalu.customrecipes.controller;
+package com.linmalu.customrecipes;
 
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.*;
@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LinmaluRecipeController
+public class RecipeData
 {
 	public static final char[] SHAPES = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'};
 	public static final int NONE = 0;
@@ -16,9 +16,9 @@ public class LinmaluRecipeController
 	public static final int SHAPED = 2;
 	public static final int SHAPELESS = 3;
 
-	public static LinmaluRecipe createLinmaluRecipe(Recipe recipe)
+	public static LinmaluRecipeController.LinmaluRecipe createLinmaluRecipe(Recipe recipe)
 	{
-		return new LinmaluRecipe(recipe);
+		return new LinmaluRecipeController.LinmaluRecipe(recipe);
 	}
 
 	public static String[] getShape(List<ItemStack> list)
@@ -192,9 +192,9 @@ public class LinmaluRecipeController
 		}
 
 		@SuppressWarnings("unchecked")
-		public static LinmaluRecipe deserialize(Map<String, Object> map)
+		public static LinmaluRecipeController.LinmaluRecipe deserialize(Map<String, Object> map)
 		{
-			return new LinmaluRecipe((int)map.get(KEY1), (List<ItemStack>)map.get(KEY2), (ItemStack)map.get(KEY3));
+			return new LinmaluRecipeController.LinmaluRecipe((int)map.get(KEY1), (List<ItemStack>)map.get(KEY2), (ItemStack)map.get(KEY3));
 		}
 
 		public int getType()
@@ -246,7 +246,7 @@ public class LinmaluRecipeController
 
 		public boolean equalsRecipe(Recipe recipe)
 		{
-			LinmaluRecipe target = createLinmaluRecipe(recipe);
+			LinmaluRecipeController.LinmaluRecipe target = createLinmaluRecipe(recipe);
 			if(type == target.getType() && output.getType() == target.getOutput().getType() && input.size() == target.getInput().size())
 			{
 				for(int i = 0; i < input.size(); i++)
