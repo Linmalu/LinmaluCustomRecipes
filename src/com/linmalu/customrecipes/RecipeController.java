@@ -1,6 +1,6 @@
-package com.linmalu.customrecipes.controller;
+package com.linmalu.customrecipes;
 
-import com.linmalu.customrecipes.Main;
+import com.linmalu.customrecipes.controller.LinmaluRecipeController;
 import com.linmalu.library.api.LinmaluItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -11,14 +11,15 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.*;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 import java.util.stream.StreamSupport;
 
-public class LinmaluInventoryController
+public class RecipeController
 {
-	private static final Map<Player, LinmaluInventoryController> map = new HashMap<>();
+	private static final Map<Player, RecipeController> map = new HashMap<>();
 	private static NamespacedKey key = new NamespacedKey(Main.getMain(), Main.getMain().getDescription().getName());
 	private static final int[] RECIPE_NUMBER = {11, 12, 13, 20, 21, 22, 29, 30, 31};
 	private static final ItemStack ITEM0 = getItemStack(Material.WHITE_STAINED_GLASS_PANE, 1, 0, true, " ", "");
@@ -39,8 +40,12 @@ public class LinmaluInventoryController
 
 	public static ItemStack getItemStack(Material type, int amount, int damage, boolean hideFlag, String name, String... lore)
 	{
-		ItemStack item = new ItemStack(type, amount, (short)damage);
+		ItemStack item = new ItemStack(type, amount);
 		ItemMeta im = item.getItemMeta();
+		if(im instanceof Damageable)
+		{
+			((Damageable)im).setDamage(damage);
+		}
 		if(hideFlag)
 		{
 			im.addItemFlags(ItemFlag.values());
@@ -56,9 +61,9 @@ public class LinmaluInventoryController
 
 	public static void InventoryClickEvent(InventoryClickEvent event)
 	{
-		if(event.getInventory().getTitle().equals(Main.INVENTORY_TITLE))
+		if(event.getInventory().getTitle().equals(Main.getInstance().getTitle()))
 		{
-			LinmaluInventoryController lic = map.get(event.getWhoClicked());
+			RecipeController lic = map.get(event.getWhoClicked());
 			if(lic == null)
 			{
 				event.setCancelled(true);
@@ -187,7 +192,7 @@ public class LinmaluInventoryController
 
 	public static void InventoryCloseEvent(InventoryCloseEvent event)
 	{
-		if(event.getInventory().getTitle().equals(Main.INVENTORY_TITLE))
+		if(event.getInventory().getTitle().equals(Main.getInstance().getTitle()))
 		{
 			map.remove(event.getPlayer());
 		}
@@ -199,11 +204,11 @@ public class LinmaluInventoryController
 	private int page = 0;
 	private List<Recipe> list = new ArrayList<>();
 
-	public LinmaluInventoryController(Player player)
+	public RecipeController(Player player)
 	{
 		this.player = player;
 		map.put(player, this);
-		inv = Bukkit.createInventory(null, 54, Main.INVENTORY_TITLE);
+		inv = Bukkit.createInventory(null, 54, Main.getInstance().getTitle());
 		player.openInventory(inv);
 		changeBase();
 	}
@@ -237,7 +242,6 @@ public class LinmaluInventoryController
 		baseItemStack();
 	}
 
-	@SuppressWarnings("deprecation")
 	public void changeRecipeList(int page)
 	{
 		inv.clear();
@@ -314,7 +318,6 @@ public class LinmaluInventoryController
 		baseItemStack();
 	}
 
-	@SuppressWarnings("deprecation")
 	public void changeFurnaceList(int page)
 	{
 		inv.clear();
@@ -404,7 +407,6 @@ public class LinmaluInventoryController
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	public Recipe toRecipe()
 	{
 		Recipe recipe = null;
